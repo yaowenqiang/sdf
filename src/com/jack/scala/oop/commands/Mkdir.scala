@@ -12,7 +12,7 @@ class Mkdir(name: String) extends Command {
         } else if (checkIllegal(name)) {
             state.setMessage(s"${name}: Illegal entry name!")
         } else {
-            doMkdir(name, state)
+            doMkdir(state, name)
         }
 
     }
@@ -21,7 +21,25 @@ class Mkdir(name: String) extends Command {
         name.contains(".")
     }
 
-    def doMkdir(str: String, state: State)  : State = {
-        ???
+    def doMkdir(state: State, name: String)  : State = {
+        def updateStructure(currentDirectory: Directory, path: List[String], newEntry: Directory) :Directory =
+            if (path.isEmpty) currentDirectory.addEntry(newEntry)
+            else {
+                println(path)
+                println(path.head)
+                println(path.head.isEmpty)
+                println(currentDirectory.findEntry(path.head))
+                val oldEntry = currentDirectory.findEntry(path.head).asDirectory
+                currentDirectory.replaceEntry(oldEntry.name, updateStructure(oldEntry, path.tail, newEntry))
+            }
+
+        val wd = state.wd
+        val allDirsInPath = wd.getAllFoldersInPath
+
+        val newDir = Directory.empty(wd.path, name)
+
+        val newRoot = updateStructure(state.root, allDirsInPath, newDir)
+        val newWd = newRoot.findDescendant(allDirsInPath)
+        State(newRoot, newWd)
     }
 }
