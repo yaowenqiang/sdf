@@ -28,8 +28,9 @@ class Directory(override val parentPath: String, override  val name: String, val
         }
         findEntryHelper(entryName, contents)
     }
-    def replaceEntry(entryName: String, newEntry: Directory) :Directory =
-        new Directory(parentPath, name, contents.filter(e => !e.name.equals(entryName)) :+ newEntry )
+
+    def replaceEntry(entryName: String, newEntry: DirEntry): Directory =
+        new Directory(parentPath, name, contents.filter(e => !e.name.equals(entryName)) :+ newEntry)
     def asDirectory: Directory = this
     def isRoot: Boolean = parentPath.isEmpty
     def isDirectory: Boolean = true
