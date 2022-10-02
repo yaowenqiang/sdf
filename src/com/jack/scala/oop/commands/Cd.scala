@@ -23,8 +23,23 @@ class Cd(dir: String) extends Command {
         }
     }
 
+//    @tailrec
+    // TODO
+    def collapseRelativePath(path: List[String], result: List[String]) :List[String] = {
+        if (path.isEmpty) result
+        else if (".".equals(path.head)) collapseRelativePath(path.tail, result)
+        else if ("..".equals(path.head)) {
+            if (result.isEmpty) null
+            else collapseRelativePath(path.tail, result.init)
+        } else {
+            collapseRelativePath(path.tail, result :+ path.head)
+        }
+    }
+
+
     def doFindEntry(root: Directory, path: String) : DirEntry = {
         val tokens :List[String] = path.substring(1).split(Directory.SEPARATOR).toList
+
         @tailrec
         def findEntryHelper(currentDirectory: Directory, path:List[String]) :DirEntry = {
             if(path.isEmpty || path.head.isEmpty) currentDirectory
@@ -36,6 +51,9 @@ class Cd(dir: String) extends Command {
             }
         }
 
-        findEntryHelper(root,tokens)
+
+        val newTokens = collapseRelativePath(tokens,List())
+        if(newTokens == null) null
+        else findEntryHelper(root,newTokens)
     }
 }
