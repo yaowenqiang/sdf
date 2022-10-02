@@ -1,9 +1,12 @@
 package com.jack.scala.oop.files
 
+import com.jack.scala.oop.filesystem.FileSystemException
+
 import scala.annotation.tailrec
 
 class Directory(override val parentPath: String, override  val name: String, val contents : List[DirEntry])
     extends  DirEntry (parentPath, name) {
+    def asFile: File = throw new FileSystemException("Directory con not be converted to a file")
     def hasEntry(name: String) :Boolean =
         findEntry(name) != null
     def getAllFoldersInPath: List[String] =
@@ -11,7 +14,7 @@ class Directory(override val parentPath: String, override  val name: String, val
     def findDescendant(path: List[String]) : Directory =
         if (path.isEmpty) this
         else findEntry(path.head).asDirectory.findDescendant(path.tail)
-    def addEntry(newEntry :Directory) :Directory =
+    def addEntry(newEntry :DirEntry) :Directory =
         new Directory(parentPath, name, contents :+ newEntry)
     def findEntry(entryName: String) : DirEntry = {
         @tailrec
